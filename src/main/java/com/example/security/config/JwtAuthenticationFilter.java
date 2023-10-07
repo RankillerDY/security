@@ -25,10 +25,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
-  @Autowired
   private final JwtService jwtService;
 
-  private UserDetailsService userDetailsService;
+  private final UserDetailsService userDetailsService;
 
   @Override
   protected void doFilterInternal(
@@ -48,6 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     jwt = authHeader.substring(7);
     userEmail = jwtService.extractUsername(jwt);
     if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+      logger.info("Email: " + userEmail);
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
       if(jwtService.isTokenValid(jwt, userDetails)) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

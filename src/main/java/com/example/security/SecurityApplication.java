@@ -29,7 +29,7 @@ public class SecurityApplication {
               .role(ADMIN)
               .password("846130225")
               .build();
-      System.out.println("Authentication token " + auth.register(admin).getToken());
+      System.out.println("Admin authentication token " + auth.register(admin).getToken());
 
       var manager =
               RegisterRequest.builder()
@@ -39,7 +39,7 @@ public class SecurityApplication {
                       .role(MANAGER)
                       .password("1234")
                       .build();
-      System.out.println("Authentication token " + auth.register(manager).getToken());
+      System.out.println("Manager authentication token " + auth.register(manager).getToken());
 
     };
   }
