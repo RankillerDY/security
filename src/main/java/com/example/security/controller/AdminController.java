@@ -1,4 +1,4 @@
-package com.example.security.demo;
+package com.example.security.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

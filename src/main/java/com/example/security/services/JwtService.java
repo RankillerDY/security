@@ -9,16 +9,16 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
-  private static final String SECRET_KEY =
-      "9dc3f88bdc6bda759fe938e538794a661ced711c543ee76b7575b0b1dd6ef78df7a9956ce282bde0093559d94df813aac0bcf89a9335f5706f0989247752996c";
+
+  @Value("${api.security.token.secret}")
+  private String SECRET_KEY;
 
   public String extractUsername(String jwt) {
     return extractClaim(jwt, Claims::getSubject);
@@ -30,18 +30,18 @@ public class JwtService {
 
   public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
     return Jwts.builder()
-        .setClaims(extraClaims)
-        .setSubject(userDetails.getUsername())
-        .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
-        .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-        .compact();
+            .setClaims(extraClaims)
+            .setSubject(userDetails.getUsername())
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .compact();
   }
 
-   /*
-   Hàm này để lấy ra từng phần của claims (Claims một khối các dữ liệu trong token),
-   Hàm này nhận 2 parameter là token và Function<Claims,T>
-  */
+  /*
+  Hàm này để lấy ra từng phần của claims (Claims một khối các dữ liệu trong token),
+  Hàm này nhận 2 parameter là token và Function<Claims,T>
+ */
   public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
     final Claims claims = extractAllClaims(token);
     return claimsResolver.apply(claims); //Hàm này có chức năng áp dụng cái function được truyền vào từ argument để xử lí claim
@@ -51,10 +51,10 @@ public class JwtService {
   //Hàm này lấy tất cả các claims trong token
   public Claims extractAllClaims(String token) {
     return Jwts.parserBuilder()
-        .setSigningKey(getSignInKey()) //Sign in key là một cách thức để lưu dữ liệu trong quá trình xử lý cũng như là để bảo mật
-        .build()
-        .parseClaimsJws(token)
-        .getBody();
+            .setSigningKey(getSignInKey()) //Sign in key là một cách thức để lưu dữ liệu trong quá trình xử lý cũng như là để bảo mật
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
   }
 
   public boolean isTokenValid(String token, UserDetails userDetails) {
