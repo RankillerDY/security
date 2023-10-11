@@ -1,10 +1,9 @@
 package com.example.security.services;
 
-import com.example.security.auth.AuthenticationRequest;
-import com.example.security.auth.AuthenticationResponse;
-import com.example.security.auth.RegisterRequest;
-import com.example.security.dao.UserRepository;
-import com.example.security.user.Role;
+import com.example.security.auth.dto.AuthenticationResponseDTO;
+import com.example.security.auth.dto.AuthenticationRequestDTO;
+import com.example.security.auth.dto.RegisterRequestDTO;
+import com.example.security.repository.UserRepository;
 import com.example.security.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,35 +15,35 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+
   @Autowired private final UserRepository repo;
   @Autowired private final JwtService jwtService;
   @Autowired private final AuthenticationManager authenticationManager;
 
   private final PasswordEncoder passwordEncoder;
 
-  // This function will create a user, save it to the database
-  // Then generated a token for it
-  public AuthenticationResponse register(RegisterRequest request) {
-    var user =
-        User.builder()
-            .firstname(request.getFirstName())
-            .lastname(request.getLastName())
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .role(request.getRole())
-            .build();
-    repo.save(user);
-    var jwtToken = jwtService.generateToken(user);
-    return AuthenticationResponse.builder().token(jwtToken).build();
+  public AuthenticationResponseDTO register(RegisterRequestDTO request) {
+    if (!repo.existsByEmail(request.email())) {
+      var user =
+              User.builder()
+                      .firstname(request.firstName())
+                      .lastname(request.lastName())
+                      .email(request.email())
+                      .password(passwordEncoder.encode(request.password()))
+                      .role(request.role())
+                      .build();
+      repo.save(user);
+      var jwtToken = jwtService.generateToken(user);
+      return AuthenticationResponseDTO.builder().token(jwtToken).build();
+    }
+    return new AuthenticationResponseDTO(null);  //  <- Because a user with the same credentials is already registered, typically in applications, duplicate entries should be avoided.
   }
 
-  public AuthenticationResponse authenticate(AuthenticationRequest request) {
+  public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO request) {
     authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-    // If the user get through this point
-    // Meaning that they already authenticated
-    var user = repo.findByEmail(request.getEmail()).orElseThrow();
+        new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+    var user = repo.findByEmail(request.email()).orElseThrow();
     var jwtToken = jwtService.generateToken(user);
-    return AuthenticationResponse.builder().token(jwtToken).build();
+    return AuthenticationResponseDTO.builder().token(jwtToken).build();
   }
 }

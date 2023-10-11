@@ -1,4 +1,4 @@
-package com.example.security.demo;
+package com.example.security.controller;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/management")
 public class ManagementController {
     @GetMapping
-    public String get() {
-        return "GET:: management controller";
-    }
+    public String get() {return "GET:: management controller";}
     @PostMapping
     public String post() {
         return "GET:: management controller";

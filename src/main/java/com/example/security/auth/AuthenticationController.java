@@ -1,5 +1,8 @@
 package com.example.security.auth;
 
+import com.example.security.auth.dto.AuthenticationRequestDTO;
+import com.example.security.auth.dto.AuthenticationResponseDTO;
+import com.example.security.auth.dto.RegisterRequestDTO;
 import com.example.security.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -21,16 +24,16 @@ public class AuthenticationController {
     
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
+    public ResponseEntity<AuthenticationResponseDTO> register(
+            @RequestBody RegisterRequestDTO request
     ) {
         logger.info("The request information" + request);
         return ResponseEntity.ok(services.register(request));
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody AuthenticationRequest request
+    public ResponseEntity<AuthenticationResponseDTO> register(
+            @RequestBody AuthenticationRequestDTO request
     ) {
         return ResponseEntity.ok(services.authenticate(request));
     }
